@@ -63,47 +63,54 @@ var writeRes = function (res, result) {
   res.end();
 };
 
-A.prototype.handleRequest = function (req, res, next) {
-  if (!req.ast) throw new Error('req.ast is missing!');
+A.prototype.handleRequest = function () {
+  var self = this;
+  
+  return function (req, res, next) {
+    if (!req.ast) throw new Error('req.ast is missing!');
 
-  // only bucket operations are managed here
-  if (!req.ast.bucketOp) {
-    next();
-    return;
+    debug(req.ast);
+
+    // only bucket operations are managed here
+    if (!req.ast.bucketOp) {
+      next();
+      return;
+    }
+
+    
+    if (req.ast.queryType === 'grant') {
+      handleRequest(req, res)
+        .then(function (data) {
+          var acl = new Acl(self.table, self.createOptions_(req));
+          return acl.grant(data.name, data.verbs, req.params.accountid, req)
+        })
+        .then(writeRes.bind(self, res), writeRes.bind(self, res));
+    } else if (req.ast.queryType === 'revoke') {
+      handleRequest(req, res)
+        .then(function (data) {
+          var acl = new Acl(self.table, self.createOptions_(req));
+          return acl.revoke(data.name, data.verbs, req.params.accountid, req)
+        })
+        .then(writeRes.bind(self, res), writeRes.bind(self, res));
+    } else {
+      var acl = new Acl(self.table, self.createOptions_(req));
+      acl.init();
+
+      acl.isAllowed(req.url, req.method, req.headers.user)
+        .then(function (result) {
+          if (!result) {
+            self.handleError(req, res, next, 'Operation not allowed! ' + req.method + ' ' + req.url + ' user:' + req.headers.user);
+            return;
+          }
+          next();
+        })
+        .catch(function (err) {
+          self.handleError(req, res, next, 'Internal error: ' + err);
+        });
+
+    }
+
   }
-
-  if (req.ast.queryType === 'grant') {
-    handleRequest(req, res)
-      .then(function (data) {
-        var acl = new Acl(this.table, this.createOptions_(req));
-        return acl.grant(data.name, data.verbs, req.params.accountid, req)
-      })
-      .then(writeRes.bind(this, res), writeRes.bind(this, res));
-  } else if (req.ast.queryType === 'revoke') {
-    handleRequest(req, res)
-      .then(function (data) {
-        var acl = new Acl(this.table, this.createOptions_(req));
-        return acl.revoke(data.name, data.verbs, req.params.accountid, req)
-      })
-      .then(writeRes.bind(this, res), writeRes.bind(this, res));
-  } else {
-    var acl = new Acl(self.table, self.createOptions_(req));
-    acl.init();
-
-    acl.isAllowed(req.url, req.method, req.headers.user)
-      .then(function (result) {
-        if (!result) {
-          this.handleError(req, res, next, 'Operation not allowed! ' + req.method + ' ' + req.url + ' user:' + req.headers.user);
-          return;
-        }
-        next();
-      })
-      .catch(function (err) {
-        self.handleError(req, res, next, 'Internal error: ' + err);
-      });
-
-  }
-
 };
 
 module.exports = A;

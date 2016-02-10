@@ -1,0 +1,30 @@
+{
+  "name": "odacl",
+  "version": "0.0.1",
+  "description": "Access Control Lists for Odata server",
+  "main": "odacl.js",
+  "dependencies": {
+    "connectlight": "*",
+    "mysqlacl": "*",
+    "odparser": "*"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gizur/odacl.git"
+  },
+  "keywords": [
+    "ACL",
+    "Odata",
+    "Authorization"
+  ],
+  "author": "Jonas Colmsjö",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gizur/odacl/issues"
+  },
+  "homepage": "https://github.com/gizur/odacl#readme"
+}

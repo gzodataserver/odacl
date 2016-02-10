@@ -46,8 +46,13 @@ var handleError = function (req, res, next, err) {
 var acl = new OdAcl('perms', {
   host: 'localhost'
 }, handleError);
-mws.use(acl);
+mws.use(acl.handleRequest());
 
+
+mws.use('/', function (req, res, next) {
+  res.write('Unmatched request:' + req.url);
+  res.end();
+});
 
 mws.listen(3000);
 
