@@ -69,48 +69,50 @@ A.prototype.handleRequest = function () {
     if (!req.ast) throw new Error('req.ast is missing!');
 
     var acl = new Acl(self.table, self.createOptions_(req));
-    acl.init();
+    acl.init()
+      .then(function () {
 
-    // grant
-    if (req.ast.queryType === 'grant') {
-      handleRequest_(req, res)
-        .then(function (data) {
-          return acl.grant(data.name, data.verbs, data.accountId)
-        })
-        .then(writeRes.bind(self, res), writeRes.bind(self, res));
-    }
+        // grant
+        if (req.ast.queryType === 'grant') {
+          handleRequest_(req, res)
+            .then(function (data) {
+              return acl.grant(data.name, data.verbs, data.accountId)
+            })
+            .then(writeRes.bind(self, res), writeRes.bind(self, res));
+        }
 
-    // revoke
-    else if (req.ast.queryType === 'revoke') {
-      handleRequest_(req, res)
-        .then(function (data) {
-          return acl.revoke(data.name, data.verbs, data.accountId)
-        })
-        .then(writeRes.bind(self, res), writeRes.bind(self, res));
-    }
+        // revoke
+        else if (req.ast.queryType === 'revoke') {
+          handleRequest_(req, res)
+            .then(function (data) {
+              return acl.revoke(data.name, data.verbs, data.accountId)
+            })
+            .then(writeRes.bind(self, res), writeRes.bind(self, res));
+        }
 
-    // only bucket operations are managed here
-    else if (!req.ast.bucketOp) {
-      next();
-      return;
-    }
-
-    // bucket operation
-    else {
-      acl.isAllowed(req.ast.table, req.ast.queryType, req.headers.user)
-        .then(function (result) {
-          if (!result) {
-            self.handleError(req, res, next, 'Operation not allowed! ' + req.method + ' ' + req.url + ' user:' + req.headers.user);
-            return;
-          }
+        // only bucket operations are managed here
+        else if (!req.ast.bucketOp) {
           next();
-        })
-        .catch(function (err) {
-          self.handleError(req, res, next, 'Internal error: ' + err);
-          error(err);
-        });
+          return;
+        }
 
-    }
+        // bucket operation
+        else {
+          acl.isAllowed(req.ast.table, req.ast.queryType, req.headers.user)
+            .then(function (result) {
+              if (!result) {
+                self.handleError(req, res, next, 'Operation not allowed! ' + req.method + ' ' + req.url + ' user:' + req.headers.user);
+                return;
+              }
+              next();
+            })
+            .catch(function (err) {
+              self.handleError(req, res, next, 'Internal error: ' + err);
+              error(err);
+            });
+
+        }
+      });
 
   }
 };
