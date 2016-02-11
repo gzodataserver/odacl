@@ -40,7 +40,7 @@ var handleError = function (req, res, next, err) {
   res.write(err);
   res.end();
 
-  error(err);
+  debug(err);
 };
 
 var acl = new OdAcl('perms', {

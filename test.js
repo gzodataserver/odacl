@@ -44,6 +44,7 @@ var createOptions = function (accountId, password, path, method) {
 
 log('A web server should be running on localhost:3000');
 
+log('\n!!unmatched request is expected!!\n')
 remote.request(createOptions(A1.accountId, A1.password, '/help', 'GET'))
   .then(function (res) {
     log(res);
@@ -52,9 +53,9 @@ remote.request(createOptions(A1.accountId, A1.password, '/help', 'GET'))
     var path = '/' + A1.accountId + '/s/grant';
     debug(path);
     return remote.request(createOptions(A1.accountId, A1.password, path, 'POST'), {
-      name: 'mytable', // previously tableName
-      verbs: ['GET', 'POST', 'PUT', 'DELETE'],
-      accountId: A2.accountId
+      name: 'b_mybucket', // previously tableName
+      verbs: ['select', 'insert', 'update', 'delete'],
+      accountId: A1.accountId
     });
   })
   .then(function (res) {
@@ -90,9 +91,9 @@ remote.request(createOptions(A1.accountId, A1.password, '/help', 'GET'))
     var path = '/' + A1.accountId + '/s/revoke';
     debug(path);
     return remote.request(createOptions(A1.accountId, A1.password, path, 'POST'), {
-      name: 'mytable', // previously tableName
-      verbs: ['GET', 'POST', 'PUT', 'DELETE'],
-      accountId: A2.accountId
+      name: 'b_mybucket', // previously tableName
+      verbs: ['select', 'insert', 'update', 'delete'],
+      accountId: A1.accountId
     });
   })
   .then(function (res) {
