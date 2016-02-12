@@ -101,7 +101,7 @@ A.prototype.handleRequest = function () {
           acl.isAllowed(req.ast.table, req.ast.queryType, req.headers.user)
             .then(function (result) {
               if (!result) {
-                self.handleError(req, res, next, 'Operation not allowed! ' + req.method + ' ' + req.url + ' user:' + req.headers.user);
+                writeRes(res, 'Operation not allowed! ' + req.method + ' ' + req.url + ' user:' + req.headers.user);
                 return;
               }
               next();

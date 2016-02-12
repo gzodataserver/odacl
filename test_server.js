@@ -50,7 +50,7 @@ mws.use(acl.handleRequest());
 
 
 mws.use('/', function (req, res, next) {
-  res.write('Unmatched request:' + req.url);
+  res.write('Unmatched request:' + req.method + ' ' + req.url);
   res.end();
 });
 
