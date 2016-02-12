@@ -66,7 +66,10 @@ A.prototype.handleRequest = function () {
   var self = this;
 
   return function (req, res, next) {
-    if (!req.ast) throw new Error('req.ast is missing!');
+    if (!req.ast) {
+      if (next) next();
+      return;
+    }
 
     var acl = new Acl(self.table, self.createOptions_(req));
     acl.init()
