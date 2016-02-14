@@ -76,7 +76,7 @@ A.prototype.handleRequest = function () {
       .then(function () {
 
         // grant
-        if (req.ast.queryType === 'grant') {
+        if (req.ast.queryType === 'grant_bucket') {
           handleRequest_(req, res)
             .then(function (data) {
               return acl.grant(data.name, data.verbs, data.accountId)
@@ -85,7 +85,7 @@ A.prototype.handleRequest = function () {
         }
 
         // revoke
-        else if (req.ast.queryType === 'revoke') {
+        else if (req.ast.queryType === 'revoke_bucket') {
           handleRequest_(req, res)
             .then(function (data) {
               return acl.revoke(data.name, data.verbs, data.accountId)
