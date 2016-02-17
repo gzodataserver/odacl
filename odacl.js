@@ -82,6 +82,7 @@ A.prototype.handleRequest = function () {
               return acl.grant(data.name, data.verbs, data.accountId)
             })
             .then(writeRes.bind(self, res), writeRes.bind(self, res));
+
         }
 
         // revoke
@@ -116,9 +117,11 @@ A.prototype.handleRequest = function () {
               self.handleError(req, res, next, 'Internal error: ' + err);
               error(err);
             });
-
         }
-      });
+      })
+      .catch(function (err) {
+        writeRes(res, err)
+      })
 
   }
 };
