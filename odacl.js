@@ -23,14 +23,19 @@ var A = function (table, options, handleError) {
   this.handleError = handleError;
 };
 
+
 A.prototype.createOptions_ = function (req) {
-  return {
+  var c = {
     host: this.options.host,
     user: req.headers.user,
     password: req.headers.password,
     database: this.options.database
   };
-}
+
+  if (this.options.parseChar) c['parseChar'] = this.options.parseChar;
+
+  return c;
+};
 
 var handleRequest_ = function (req, res) {
   return new Promise(function (fullfil, reject) {
