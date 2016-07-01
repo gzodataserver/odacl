@@ -33,6 +33,7 @@ A.prototype.createOptions_ = function (req) {
   };
 
   if (this.options.parseChar) c['parseChar'] = this.options.parseChar;
+  if (this.options.connectFromHost) c.connectFromHost = this.options.connectFromHost;
 
   return c;
 };
@@ -84,7 +85,7 @@ A.prototype.handleRequest = function () {
         if (req.ast.queryType === 'grant_bucket') {
           handleRequest_(req, res)
             .then(function (data) {
-              return acl.grant(data.name, data.verbs, data.accountId)
+              return acl.grant(data.name, data.verbs, data.accountId, true)
             })
             .then(writeRes.bind(self, res), writeRes.bind(self, res));
 
@@ -107,7 +108,7 @@ A.prototype.handleRequest = function () {
 
         // bucket operation
         else {
-          acl.isAllowed(req.ast.table, req.ast.queryType, req.headers.user)
+          acl.isAllowed(req.ast.table, req.ast.queryType, req.headers.user, req.ast.schema)
             .then(function (result) {
               if (!result) {
                 var err = {

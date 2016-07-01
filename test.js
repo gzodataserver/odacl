@@ -1,3 +1,4 @@
+var assert = require('assert');
 var querystring = require("querystring");
 var remote = require('gzhelpers').remote;
 
@@ -61,16 +62,6 @@ remote.request(createOptions(A1.accountId, A1.password, '/help', 'GET'))
   .then(function (res) {
     log(res);
 
-    // CREATE BUCKET
-    var path = '/' + A1.accountId + '/s/create_bucket';
-    debug(path);
-    return remote.request(createOptions(A1.accountId, A1.password, path, 'POST'), {
-      name: 'b_mybucket'
-    });
-  })
-  .then(function (res) {
-    log(res);
-
     // WRITE TO BUCKET
     var path = '/' + A1.accountId + '/b_mybucket';
     debug(path);
@@ -83,6 +74,38 @@ remote.request(createOptions(A1.accountId, A1.password, '/help', 'GET'))
     var path = '/' + A1.accountId + '/b_mybucket';
     debug(path);
     return remote.request(createOptions(A1.accountId, A1.password, path, 'GET'), null);
+  })
+  .then(function (res) {
+    log(res);
+
+    // GRANT EVERYONE READ ACCESS - **BUT** THE DB USERS STILL NEED SELECT GRANTED ON PERMS TAB!!
+    var path = '/' + A1.accountId + '/s/grant_bucket';
+    debug(path);
+    return remote.request(createOptions(A1.accountId, A1.password, path, 'POST'), {
+      name: 'b_mybucket', // previously tableName
+      verbs: ['select'],
+      accountId: '*'
+    });
+  })
+  .then(function (res) {
+    log(res);
+
+    // GRANT A2.accountId READ ACCESS **AND** SELECT GRANTS FOR PERMS TABLE
+    var path = '/' + A1.accountId + '/s/grant_bucket';
+    debug(path);
+    return remote.request(createOptions(A1.accountId, A1.password, path, 'POST'), {
+      name: 'b_mybucket',
+      verbs: ['select'],
+      accountId: A2.accountId
+    });
+  })
+  .then(function (res) {
+    log(res);
+
+    // SELECT FROM BUCKET WITH THE OTHER ACCOUNT
+    var path = '/' + A1.accountId + '/b_mybucket';
+    debug(path);
+    return remote.request(createOptions(A2.accountId, A2.password, path, 'GET'), null);
   })
   .then(function (res) {
     log(res);

@@ -1,6 +1,6 @@
 {
   "name": "odacl",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Access Control Lists for Odata server",
   "main": "odacl.js",
   "dependencies": {
